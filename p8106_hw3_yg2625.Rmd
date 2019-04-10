@@ -1,0 +1,51 @@
+---
+title: "p8106_hw3_yg2625"
+author: "Yue Gu"
+date: "April 9, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ISLR)
+library(caret)
+library(glmnet)
+library(MASS)
+library(e1071)
+library(mlbench)
+library(pROC)
+library(AppliedPredictiveModeling)
+library(tidyverse)
+```
+
+**This questions will be answered using the Weekly data set, which is part of the ISLR package. This data is similar in nature to the Smarket data on the textbook except that it contains 1,089 weekly returns for 21 years, from the beginning of 1990 to the end of 2010. A description of the data can be found by typing ?Weekly in the Console. (Note that the
+column Today is not a predictor.)**
+
+# Load Data
+```{r}
+data("Weekly")
+weekly = Weekly %>% 
+  janitor::clean_names()
+head(weekly)
+```
+
+# (a) Produce some graphical summaries of the Weekly data.
+```{r}
+# start from some simple visualization of weekly
+
+# density plot
+transparentTheme(trans = .4)
+featurePlot(x = weekly[, 1:8], 
+            y = weekly$direction,
+            scales = list(x=list(relation="free"), 
+                        y=list(relation="free")),
+            plot = "density", pch = "|", 
+            auto.key = list(columns = 2))
+
+# pairs scatterplot
+pairs(weekly)
+
+```
+
+# (b) Use the full data set to perform a logistic regression with Direction as the response and the five Lag variables plus Volume as predictors. Do any of the predictors appear to be statistically significant? If so, which ones?
+
