@@ -92,7 +92,7 @@ AUC = 0.554.
 ```{r}
 # divide data into train and test
 train_data = subset(weekly, year <= 2008)
-test_data = subset(weekly, year>=2009)
+test_data = subset(weekly, year >= 2009)
 
 # fit regression using training data
 glm.fit_tr = glm(direction ~ lag1 + lag2, 
@@ -150,6 +150,30 @@ AUC = 0.529.
 
 # (g) Repeat (e) using KNN. Briey discuss your results.
 ```{r}
+# fit KNN model on training data
+ctrl <- trainControl(method = "repeatedcv",
+                     repeats = 5,
+                     summaryFunction = twoClassSummary,
+                     classProbs = TRUE)
 
+model.knn <- train(x = train_data[2:3],
+                   y = train_data$direction,
+                   method = "knn",
+                   preProcess = c("center","scale"),
+                   tuneGrid = data.frame(k = seq(1,200,by=5)),
+                   trControl = ctrl)
+
+summary(model.knn)
+
+# predict on test data
+knn.pred = predict(model.knn, 
+                   newdata = test_data,
+                   type = "prob")
+
+# plot ROC curve
+roc.knn = roc(test_data$direction, knn.pred$Down,
+              levels = c("Down", "Up"))
+plot(roc.qda, legacy.axes = T, print.auc = T)
 ```
 
+Based on the results, AUC for KNN model is 0.529, meaning area under the ROC curve under KNN model is 52.9%. Comparing all fitted models, LDA provides the largest AUC among logistic regression, QDA, LDA and KNN. Hence, LDA tends to indicate a model with good predicting performace. However, further test on training data performance need to be conducted using CV.
